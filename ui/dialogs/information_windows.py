@@ -4,6 +4,7 @@ def show_banner(
         page: ft.Page,
         content: ft.Control
 ) -> None:
+    """Banner for different information"""
     def close_banner(e):
         page.close(page.banner)
         page.update()
@@ -26,6 +27,7 @@ def show_snackbar(
         color: ft.Colors = ft.Colors.WHITE,
         time: int = 5
 ) -> None:
+    """Simple dialog for different information"""
     snack_bar = ft.SnackBar(
         content=content,
         action_color=color,
@@ -44,15 +46,15 @@ def show_error_dialog(
         bgcolor: ft.Colors = ft.Colors.RED_300,
         icon: ft.Icons = ft.Icons.ERROR_OUTLINE
 ) -> None:
-    """Показывает кастомный диалог с ошибкой.
+    """Show custom dialog.
 
     Args:
-        page: Страница Flet
-        title: Заголовок ошибки
-        message: Текст сообщения
-        button_text: Текст кнопки (по умолчанию "OK")
-        bgcolor: Цвет фона (по умолчанию red_300)
-        icon: Иконка (по умолчанию error_outline)
+        page: current ft.Page (from main.py)
+        title: error title
+        message: message text
+        button_text: button text (default value is "OK")
+        bgcolor: background color (default - red_300)
+        icon: icon (default - error_outline)
     """
 
     def close_dialog(e):

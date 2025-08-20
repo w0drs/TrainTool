@@ -3,6 +3,9 @@ from core.models.model import Model
 
 
 class ModelManager:
+    """
+        A class that stores and manages blocks of models.
+    """
     def __init__(self):
         self._models: Dict[str, Model] = {}
 

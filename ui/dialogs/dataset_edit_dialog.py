@@ -136,9 +136,6 @@ class DatasetEditDialog:
 
     def _close(self, e) -> None:
         """Closes the dialog (private method).
-
-            Args:
-                e: The event that triggered the close action.
         """
         self.page.close(self.dialog)
         self.page.update()

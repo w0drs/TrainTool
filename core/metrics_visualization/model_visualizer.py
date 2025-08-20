@@ -12,28 +12,31 @@ matplotlib.use('Agg')
 class ModelVisualizer:
     @staticmethod
     def _get_temp_dir() -> str:
-        """Возвращает системную временную директорию (temp в Windows, /tmp в Linux)"""
+        """Returns the system temporary directory (temp on Windows, /tmp on Linux)"""
         return tempfile.gettempdir()
 
     @staticmethod
     def _get_full_path(filename: str) -> str:
-        """Генерирует полный путь во временной директории"""
+        """Generates the full path in the temporary directory"""
         temp_dir = ModelVisualizer._get_temp_dir()
         return os.path.join(temp_dir, filename)
 
     @staticmethod
     def regression_line_compare(y_true: ndarray | None, y_pred: ndarray | None) -> str:
+        """
+        Returns the path to the image with a graph showing a comparison of the true and predicted values of the model
+        """
         if y_true is None or y_pred is None:
             return ""
         plt.figure(figsize=(10, 5))
-        plt.plot(y_true, 'o-', label="Истинные значения (y)", markersize=8, linewidth=2)
-        plt.plot(y_pred, 's--', label="Предсказанные (y_pred)", markersize=6, linewidth=2)
-        plt.plot(y_true - y_pred, 's--', label="Остатки", markersize=6, linewidth=2)
-        plt.xlabel("Номер точки (или время)")
-        plt.ylabel("Значение")
+        plt.plot(y_true, 'o-', label="True values (y)", markersize=8, linewidth=2)
+        plt.plot(y_pred, 's--', label="Predicted values (y_pred)", markersize=6, linewidth=2)
+        plt.plot(y_true - y_pred, 's--', label="Residual values", markersize=6, linewidth=2)
+        plt.xlabel("Point")
+        plt.ylabel("Value")
         plt.legend()
         plt.grid(True)
-        plt.title("Сравнение истинных и предсказанных значений")
+        plt.title("Comparison of true and predicted values")
 
         file_name = "regression_lines_compare.png"
         file_path = ModelVisualizer._get_full_path(file_name)
@@ -44,6 +47,7 @@ class ModelVisualizer:
 
     @staticmethod
     def confusion_matrix(y_true: ndarray | None, y_pred: ndarray | None) -> str:
+        """Returns the path to the image with confusion matrix"""
         if y_true is None or y_pred is None:
             return ""
         cm = confusion_matrix(y_true, y_pred)
@@ -60,6 +64,7 @@ class ModelVisualizer:
 
     @staticmethod
     def roc_curve(y_true: ndarray | None, y_probs: ndarray | None) -> str:
+        """Returns the path to the image with roc curve"""
         if y_true is None or y_probs is None:
             return ""
         fpr, tpr, _ = roc_curve(y_true, y_probs)

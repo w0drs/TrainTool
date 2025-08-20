@@ -11,11 +11,11 @@ def create_settings_content(
         state: DatasetManager,
 ) -> ft.ListView:
     """
-    Creating settings content with dataset management
-    :param page: ft.Page
-    :param on_back_click: button for back to main content
-    :param state: DatasetManager - object, that contain datasets (class Dataset)
-    :return: column with settings
+        Creating settings content with dataset management
+        Args:
+        page: ft.Page
+        on_back_click: button for back to main content
+        state: DatasetManager - object, that contain datasets (class Dataset)
     """
     divider = ft.Divider(height=1, thickness=2, color=ft.Colors.WHITE)
     file_picker = ft.FilePicker()

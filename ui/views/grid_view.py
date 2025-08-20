@@ -7,6 +7,7 @@ from ui.dialogs.train_model_dialog import TrainEditDialog
 
 
 class GridView:
+    """Grid, which contains all blocks"""
     def __init__(
             self,
             page: ft.Page,
@@ -112,8 +113,9 @@ class GridView:
 
     def _open_edit_dialog(self, e, block_data: dict):
         """
-        open edit dialog for model
-        :param block_data: dict - 'color', 'name', 'description' and 'id' of model's block
+            Open edit dialog for model (private method)
+            Args:
+            block_data: dict - 'color', 'name', 'description' and 'id' of model's block
         """
         edit_dialog = EditDialog(
             page=self.page,
@@ -132,7 +134,7 @@ class GridView:
         ).show()
 
     def _refresh_grid(self):
-        """Полностью перезагружает все блоки"""
+        """Refreshing all blocks"""
         self.blocks_grid.controls.clear()
         for model_id in self.model_manager.get_all():
             model = self.model_manager.get_model(model_id)

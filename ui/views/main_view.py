@@ -5,10 +5,10 @@ def create_main_content(
     on_add_click: callable
 ) -> ft.Column:
     """
-    Creating main content for program
-    :param grid: GridView with blocks for models
-    :param on_add_click: add_button func
-    :return: column with main content
+        Creating main content for program
+        Args:
+        grid: GridView with blocks for models
+        on_add_click: add_button func
     """
     return ft.Column(
         controls=[

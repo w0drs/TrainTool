@@ -37,8 +37,6 @@ class TrainEditDialog:
         model: object of MODEL class
         features: feature columns in dataset
         target: target column in dataset
-
-
     """
     def __init__(
             self,

@@ -7,6 +7,20 @@ from ui.dialogs.information_windows import show_snackbar
 
 
 class ColumnsWidget:
+    """
+        Class, that is used in the dataset settings tab. This widget consists of two columns: features and target.
+        If the dataset is loaded successfully, the column names from the dataset will be added to the feature column.
+        These columns can be moved to the target column. This is how the features and target columns are formed for training model.
+        You can disable some columns so that they are not used during training.
+        Attributes:
+                page: current ft.Page (from main.py)
+                ds_id: id of dataset, which will be loaded
+                dsm: current dataset manger. It controls all datasets
+                current_dataset: current dataset
+                all_columns: all loaded columns from dataset
+                target_columns: target columns that are loaded from the current dataset. First value will be taken during training
+                features: feature columns in dataset
+    """
     def __init__(
             self,
             page: ft.Page,
@@ -35,8 +49,6 @@ class ColumnsWidget:
 
         self._initialize_ui()
 
-
-
         if not self.current_dataset.target_column and not self.current_dataset.features:
             self._load_initial_state()
         else:
@@ -46,6 +58,11 @@ class ColumnsWidget:
             self._update_lists()
 
     def _initialize_ui(self):
+        """
+            Attributes:
+                self.features_list: features column for ColumnsWidget
+                self.target_list: target column for ColumnsWidget
+        """
         self.features_list = ft.ListView(expand=True, spacing=5)
         self.target_list = ft.ListView(expand=True, spacing=5)
 
@@ -127,7 +144,7 @@ class ColumnsWidget:
             self._update_lists()
 
     def _update_lists(self):
-        """Обновляет оба списка на экране"""
+        """Refreshes both lists on the screen"""
         # Adding a used feature
         self.features_list.controls = [
             self._build_item(col, False, True)
@@ -146,7 +163,7 @@ class ColumnsWidget:
         self.page.update()
 
     def _clear_features(self, e):
-        """Очищает все выбранные колонки"""
+        """Clears all selected columns"""
         self._load_initial_state()
         print(self.unused_features)
         print(self.features)
@@ -199,6 +216,7 @@ class ColumnsWidget:
         )
 
     def _load_initial_state(self):
+        """Loading dataset and adding its columns to the widget"""
         self.features = []
         self.target_columns = []
         self.unused_features = []
@@ -293,6 +311,7 @@ class ColumnsWidget:
                 return df
 
     def _set_feature_types(self, df: pd.DataFrame, max_unique_cat: int = 10):
+        """Automatic column type detection"""
         for col in df.columns:
             if pd.api.types.is_datetime64_any_dtype(df[col]):
                 self.time_features.append(col)
@@ -323,6 +342,7 @@ class ColumnsWidget:
         self.page.update()
 
     def save_state(self):
+        """Saving target, feature, category, numeric, time columns in dataset"""
         if self.current_dataset:
             final_feature = [col for col in self.features if col not in self.unused_features]
             final_target = [col for col in self.target_columns if col not in self.unused_features]

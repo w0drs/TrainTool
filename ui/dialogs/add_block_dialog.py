@@ -1,6 +1,9 @@
 import flet as ft
 
 class AddDialog:
+    """
+     Window for adding a new block with model
+    """
     color_map: dict[str, ft.Colors] = {
         "black": ft.Colors.BLACK,
         "blue-grey": ft.Colors.BLUE_GREY_900,
@@ -8,11 +11,17 @@ class AddDialog:
         "deep-orange": ft.Colors.DEEP_ORANGE_900,
         "cyan": ft.Colors.CYAN_900
     }
-
     def __init__(self, page: ft.Page, add_block_func = None):
         self.page = page
         self.dialog = None
 
+        self._initialize_widgets()
+
+        self.color = ft.Colors.BLACK
+        self.title = "New model"
+        self.add_func = add_block_func
+
+    def _initialize_widgets(self):
         # Dropdown for changing the colors for blocks
         self.color_dropdown = ft.DropdownM2(
             label="color",
@@ -46,9 +55,6 @@ class AddDialog:
             self.description_field,
 
         ])
-        self.color = ft.Colors.BLACK
-        self.title = "New model"
-        self.add_func = add_block_func
 
     def show(self):
         def apply(e):
@@ -75,12 +81,24 @@ class AddDialog:
             title=ft.Text(self.title),
             content=self.content,
             actions=[
-                ft.ElevatedButton(
-                    "add",
-                    style=ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=0)
-                    ),
-                    on_click=apply
+                ft.Row(
+                    controls=[
+                        ft.ElevatedButton(
+                            "add",
+                            style=ft.ButtonStyle(
+                                shape=ft.RoundedRectangleBorder(radius=0)
+                            ),
+                            on_click=apply
+                        ),
+                        ft.ElevatedButton(
+                            "cancel",
+                            style=ft.ButtonStyle(
+                                shape=ft.RoundedRectangleBorder(radius=0)
+                            ),
+                            on_click=self._close
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.END
                 )
             ]
         )
@@ -89,7 +107,7 @@ class AddDialog:
         self.page.open(self.dialog)
         self.page.update()
 
-    def close(self):
+    def _close(self, e):
         if self.dialog:
             self.page.close(self.dialog)
             self.page.update()

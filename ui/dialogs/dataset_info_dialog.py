@@ -2,6 +2,12 @@ import flet as ft
 from core.datasets.datasets_manager import DatasetManager
 
 class DatasetInfoDialog:
+    """Dialog, which contains information about current dataset
+        Attributes:
+            page: current ft.Page (from main.py)
+            dataset_manager: current dataset manager. It controls all datasets
+            dataset_id: id of current dataset
+    """
     def __init__(
             self,
             page: ft.Page,
@@ -59,6 +65,7 @@ class DatasetInfoDialog:
         )
 
     def _info_row(self, label: str, value: any) -> ft.Row:
+        """returns text widget (private method)"""
         return ft.Row(
             controls=[
                 ft.Text(f"{label}", size=20),

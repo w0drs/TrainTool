@@ -6,6 +6,17 @@ from ui.dialogs.dataset_info_dialog import DatasetInfoDialog
 
 
 class EditDialog:
+    """
+        Dialog for adding current block with model
+        Attributes:
+            page: current ft.Page (from main.py)
+            model_manager: current model manager. It controls all model
+            dataset_manager: current dataset manager. It controls all datasets
+            refresh_grid: this is functional, which refreshing grid of blocks after editing current block
+            changed_model: Ml-model name
+            task: 'Classification' or 'Regression'
+            selected_dataset: id of dataset, which contained in current model
+    """
     color_map: dict[str, ft.Colors] = {
         "black": ft.Colors.BLACK,
         "blue-grey": ft.Colors.BLUE_GREY_900,
@@ -26,7 +37,6 @@ class EditDialog:
         self.page = page
         self.model_manager = model_manager
         self.dataset_manager = dataset_manager
-        self.block_data = block_data
         self.current_model_id = block_data.get('id', 'error!')
         self.current_model = self.model_manager.get_model(self.current_model_id)
         self.dialog = None
@@ -148,7 +158,7 @@ class EditDialog:
         )
 
     def _get_color_key(self, color: ft.Colors) -> str:
-        """Конвертируем цвет обратно в ключ для Dropdown"""
+        """Converts color back to key for Dropdown (private method)"""
         return self.reversed_color_map.get(color, "black")
 
     def show(self):
@@ -177,6 +187,7 @@ class EditDialog:
         self.page.update()
 
     def _save(self, e):
+        """Saving parameters for current block (private method)"""
         self.current_model.color = self.color_map.get(self.color_dropdown.value, ft.Colors.BLACK)
         self.current_model.model_name = self.changed_model
         self.current_model.name = self.name_field.value
@@ -217,11 +228,9 @@ class EditDialog:
         self.page.update()
 
     def _select_dataset_setting(self) -> ft.Row:
-        condition1 = bool(self.current_model.dataset_id)
-        condition2 = self._have_manager_datasets()
-
-        if condition2:
-            if condition1:
+        """Creates a widget with datasets if there are datasets loaded (private method)"""
+        if self._have_manager_datasets():
+            if bool(self.current_model.dataset_id):
                 ds_id = self.current_model.dataset_id
                 self.dataset_name.value = self.dataset_manager.get_dataset(ds_id).name
                 self.dataset_label.value = "Dataset: "
@@ -245,6 +254,7 @@ class EditDialog:
         return bool(datasets)
 
     def _create_dataset_menu(self):
+        """Widget, which contains all loaded datasets (private method)"""
         if not self._have_manager_datasets():
             return ft.Text(visible=False)
 
@@ -270,6 +280,8 @@ class EditDialog:
         )
 
     def _show_dataset_info(self, dataset_id: str):
+        """Shows a window with information about the dataset (private method)
+        """
         DatasetInfoDialog(
             page=self.page,
             dataset_manager=self.dataset_manager,
@@ -277,6 +289,7 @@ class EditDialog:
         ).show()
 
     def _select_dataset(self, dataset_id: str):
+        """Selecting a dataset for a block (private method)"""
         self.dataset_name.value = self.dataset_manager.get_dataset(dataset_id).name
         self.dataset_name.scale = 1.0
         self.dataset_label.value = "Dataset: "

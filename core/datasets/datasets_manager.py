@@ -4,6 +4,9 @@ from pathlib import Path
 
 
 class DatasetManager:
+    """
+    A class that stores and manages datasets.
+    """
     def __init__(self):
         self._datasets: Dict[str, Dataset] = {}
 

@@ -5,6 +5,14 @@ from pickle import dump as pkl_dump
 import os
 
 class ExportModelDialog:
+    """
+        Dialog, which exporting trained model
+        Attributes:
+            page: current ft.Page (from main.py)
+            model: trained model
+            method: export model method (joblib or pickle)
+            selected_folder: selected folder path for export model
+    """
     def __init__(
             self,
             page:ft.Page,

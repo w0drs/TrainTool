@@ -17,10 +17,13 @@ class AppState:
             model_manager: ModelManager
     ) -> None:
         """
-        The main application window status controller
-        :param page: ft.Page instance
-        :param grid: ft.GridView, that contain blocks of models
-        :param on_add_click: this is func, which adding a new block for grid
+            The main application window status controller.
+            Attributes:
+                page: current ft.Page from main.py
+                grid: link to GridView. GridView is object, that contains all blocks of models
+                on_add_click: this is function, that is needed to add a new block with a model
+                dataset_manager: current dataset manager (from main.py). It controls all datasets
+                model_manager: current models manager (from main.py). It controls all blocks of models
         """
         self.page = page
         self.grid = grid
