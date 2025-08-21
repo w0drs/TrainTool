@@ -201,6 +201,8 @@ class TrainEditDialog:
 
     def _transform_feature(self, df: pd.DataFrame, dataset: Dataset):
         transformers = []
+        if not dataset.can_transform:
+            return df
         if dataset.numeric_columns:
             transformers.append(
                 ("num", Pipeline([

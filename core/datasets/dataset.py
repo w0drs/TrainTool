@@ -34,6 +34,7 @@ class Dataset:
     target_column_type: str = None
     time_columns: list = None
     features: list = None
+    can_transform: bool = False
 
     def __post_init__(self):
         self.id = str(uuid.uuid4())

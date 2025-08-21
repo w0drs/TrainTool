@@ -74,6 +74,8 @@ class DatasetEditDialog:
             width=150,
         )
 
+        self.transform_checkbox_value = self.current_dataset.can_transform
+
     def _get_content(self) -> ft.ListView:
         """Builds and returns the dialog's content components(private method).
 
@@ -91,6 +93,16 @@ class DatasetEditDialog:
                     controls=[
                         self.encoding_dropdown,
                         self.delimiter_textfield
+                    ]
+                ),
+                self.divider,
+                ft.Row(
+                    controls=[
+                        ft.Checkbox(
+                            value=self.transform_checkbox_value,
+                            on_change=self._on_transform_checkbox_change
+                        ),
+                        ft.Text("Transform category, numeric and time columns")
                     ]
                 ),
                 self.divider,
@@ -134,6 +146,9 @@ class DatasetEditDialog:
                 message="Few columns, try to change another delimiter in setting"
             )
 
+    def _on_transform_checkbox_change(self, e=None):
+        self.transform_checkbox_value = e.control.value
+
     def _close(self, e) -> None:
         """Closes the dialog (private method).
         """
@@ -152,6 +167,7 @@ class DatasetEditDialog:
         self.dataset_widget.save_state()
         self.current_dataset.encoding = self.encoding_dropdown.value
         self.current_dataset.delimiter = self.delimiter_textfield.value
+        self.current_dataset.can_transform = self.transform_checkbox_value
 
         self._close(e)
 
