@@ -1,7 +1,7 @@
 import flet as ft
 
 from core.datasets.datasets_manager import DatasetManager
-from core.models.model_manager import ModelManager
+from core.models.models_manager import ModelManager
 from ui.dialogs.dataset_info_dialog import DatasetInfoDialog
 
 

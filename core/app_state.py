@@ -1,7 +1,7 @@
 import flet as ft
 
 from core.datasets.datasets_manager import DatasetManager
-from core.models.model_manager import ModelManager
+from core.models.models_manager import ModelManager
 from ui.views.main_view import create_main_content
 from ui.views.settings_view import create_settings_content
 

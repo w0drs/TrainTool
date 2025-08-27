@@ -2,7 +2,7 @@ import flet as ft
 
 from core.app_state import AppState
 from core.datasets.datasets_manager import DatasetManager
-from core.models.model_manager import ModelManager
+from core.models.models_manager import ModelManager
 from ui.components.nav_drawer import AppDrawer
 from ui.views.grid_view import GridView
 from ui.dialogs.add_block_dialog import AddDialog

@@ -2,7 +2,7 @@ import flet as ft
 
 from core.datasets.datasets_manager import DatasetManager
 from ui.dialogs.block_edit_dialog import EditDialog
-from core.models.model_manager import ModelManager
+from core.models.models_manager import ModelManager
 from ui.dialogs.train_model_dialog import TrainEditDialog
 
 
