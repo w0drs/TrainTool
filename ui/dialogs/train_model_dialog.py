@@ -2,12 +2,14 @@ import pandas as pd
 import flet as ft
 import os
 
+from catboost import CatBoostClassifier, CatBoostRegressor
+
 from core.datasets.dataset import Dataset
 from core.datasets.datasets_manager import DatasetManager
 from core.models.model import Model
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression, Lasso, Ridge, ElasticNet
 from sklearn.svm import SVC, SVR
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, AdaBoostRegressor, AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.model_selection import GridSearchCV
@@ -55,6 +57,8 @@ class TrainEditDialog:
 
         self._initialize_widgets()
         self._initialize_dialog()
+
+        self.dataset_settings: dict | None = None # One-Hot-Encoder / StandardScaler / SimpleImputer settings
 
         # for export to pdf
         self.y_true: np.ndarray | None = None
@@ -117,6 +121,9 @@ class TrainEditDialog:
         )
 
     def _initialize_widgets(self):
+        """
+            Initializing widgets
+        """
         self.dataset_bar = ft.Text(size=25, color=ft.Colors.RED)
         self.train_bar = ft.Text(size=25, color=ft.Colors.RED)
         self.save_metric_bar = ft.Text(size=25, color=ft.Colors.RED)
@@ -162,6 +169,9 @@ class TrainEditDialog:
         )
 
     def _get_dataset(self) -> tuple[np.ndarray, np.ndarray] | tuple[None, None]:
+        """
+            Uploading the dataset and transform them
+        """
         try:
             df = None
             dataset_id = self.model.dataset_id
@@ -173,15 +183,18 @@ class TrainEditDialog:
 
             usecols = current_dataset.features + [current_dataset.target_column[0]]
 
-            # Используем менеджер контекста для файлов
+            # csv/txt
             if current_dataset.path.name.endswith((".csv", ".txt")):
                 with pd.option_context('mode.chained_assignment', None):
                     df = self._load_csv(current_dataset, usecols)
+            # xlsx
             elif current_dataset.path.name.endswith(".xlsx"):
                 df = self._load_xlsx(current_dataset, usecols)
+            # json
             elif current_dataset.path.name.endswith(".json"):
                 df = self._load_json(current_dataset, usecols)
 
+            # transform dataset
             if df is not None:
                 features = df[current_dataset.features]
                 transformed_features = self._transform_feature(features, current_dataset)
@@ -200,9 +213,17 @@ class TrainEditDialog:
         return None, None
 
     def _transform_feature(self, df: pd.DataFrame, dataset: Dataset):
-        transformers = []
+        """
+        Transform dataframe and return them. If the transformation is impossible, then return the original dataframe
+        """
         if not dataset.can_transform:
             return df
+        transformers = []
+
+        if dataset.settings is None:
+            dataset.settings = dict()
+
+        # transform for numeric columns
         if dataset.numeric_columns:
             transformers.append(
                 ("num", Pipeline([
@@ -210,6 +231,9 @@ class TrainEditDialog:
                     ("scaler", StandardScaler())
                 ]), dataset.numeric_columns)
             )
+            dataset.settings["numeric features"] = ["SimpleImputer(strategy='mean')", "StandardScaler()"]
+
+        # transform for category columns
         if dataset.category_columns:
             transformers.append(
                 ("cat", Pipeline([
@@ -217,6 +241,9 @@ class TrainEditDialog:
                     ("encoder", OneHotEncoder())
                 ]), dataset.category_columns)
             )
+            dataset.settings["category features"] = ["SimpleImputer(strategy='most_frequent')", "OneHotEncoder()"]
+
+        # transform for date columns
         if dataset.time_columns:
             date_processor = FunctionTransformer(
                 self._full_date_processing,
@@ -226,6 +253,10 @@ class TrainEditDialog:
             transformers.append(
                 ("date", date_processor, dataset.time_columns)
             )
+
+            dataset.settings["time features"] = [
+                "Uses its own method of time conversion. It is not recommended to include time columns in training"
+            ]
         if transformers:
             try:
                 preprocessor = ColumnTransformer(
@@ -263,21 +294,26 @@ class TrainEditDialog:
     def _transform_target(self, df: pd.DataFrame, dataset: Dataset):
         target_col = dataset.target_column[0]
 
-        if dataset.target_column_type == "numeric":
+        if dataset.target_column_type == "numeric" or not dataset.can_transform:
             return df[target_col].values
 
         elif dataset.target_column_type == "category":
+            if dataset.settings is None:
+                dataset.settings = dict()
+
             if self.model.task == "Classification":
 
                 imputer = SimpleImputer(strategy="most_frequent")
                 le = LabelEncoder()
 
                 imputed = imputer.fit_transform(df[[target_col]]).ravel()
+                dataset.settings["target column"] = ["SimpleImputer(strategy='most_frequent')", "LabelEncoder()"]
 
                 return le.fit_transform(imputed)
 
             elif self.model.task == "Regression":
                 imputer = SimpleImputer(strategy="most_frequent")
+                dataset.settings["target column"] = ["SimpleImputer(strategy='most_frequent')"]
                 return imputer.fit_transform(df[[target_col]]).ravel()
 
         return df[target_col].values
@@ -357,6 +393,31 @@ class TrainEditDialog:
         if model_name == "Linear regression":
             model = LinearRegression(n_jobs=-1)
 
+        elif model_name == "Ridge regression":
+            model = Ridge()
+            params = {
+                'alpha': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
+                'fit_intercept': [True, False],
+                'solver': ['auto', 'svd', 'cholesky', 'lsqr', 'sparse_cg', 'sag', 'saga']
+            }
+
+        elif model_name == "Lasso regression":
+            model = Lasso()
+            params = {
+                'alpha': [0.001, 0.01, 0.1, 1, 10, 100],
+                'fit_intercept': [True, False],
+                'selection': ['cyclic', 'random']
+            }
+
+        elif model_name == "ElasticNet regression":
+            model = ElasticNet()
+            params = {
+                'alpha': [0.001, 0.01, 0.1, 1, 10],
+                'l1_ratio': [0.1, 0.3, 0.5, 0.7, 0.9],
+                'fit_intercept': [True, False],
+                'selection': ['cyclic', 'random']
+            }
+
         elif model_name == "Logistic regression":
             model = LogisticRegression(n_jobs=-1)
             params = {
@@ -404,6 +465,49 @@ class TrainEditDialog:
                 'n_neighbors': [3, 5, 7],
                 'weights': ['uniform', 'distance']
             }
+
+        elif model_name == "AdaBoost":
+            if self.model.task == "Regression":
+                model = AdaBoostRegressor()
+                params = {
+                    'n_estimators': [50, 100, 200],
+                    'learning_rate': [0.01, 0.1, 1.0],
+                    'loss': ['linear', 'square', 'exponential'],
+                    'random_state': [42]
+                }
+
+            else:
+                model = AdaBoostClassifier()
+                params = {
+                    'n_estimators': [50, 100, 200],
+                    'learning_rate': [0.01, 0.1, 1.0],
+                    'random_state': [42]
+                }
+
+        elif model_name == "CatBoost":
+            current_ds = self.ds_manager.get_dataset(self.model.dataset_id)
+            if self.model.task == "Regression":
+                model = CatBoostRegressor(cat_features=current_ds.category_columns)
+                params = {
+                    'iterations': [100, 200, 500],
+                    'learning_rate': [0.01, 0.05, 0.1],
+                    'depth': [4, 6, 8],
+                    'l2_leaf_reg': [1, 3, 5],
+                    'loss_function': ['RMSE'],
+                    'verbose': [False]
+                }
+
+            else:
+                model = CatBoostClassifier(cat_features=current_ds.category_columns)
+                params = {
+                    'iterations': [100, 200, 500],
+                    'learning_rate': [0.01, 0.05, 0.1],
+                    'depth': [4, 6, 8],
+                    'l2_leaf_reg': [1, 3, 5],
+                    'random_strength': [1, 2, 3],
+                    'verbose': [False]
+                }
+
         # for metrics
         if self.model.task == "Classification":
             scoring = {'accuracy': make_scorer(accuracy_score), 'f1': make_scorer(f1_score, average='weighted')}
@@ -489,6 +593,7 @@ class TrainEditDialog:
             self._progress_text_info(bar=self.save_metric_bar, text=saving_metrics, color=ft.Colors.GREEN)
 
             print("Training was ended!")
+            self._set_ui_state(training=False)
             show_snackbar(
                 self.page,
                 ft.Text("Training was ended!", color=ft.Colors.WHITE),
@@ -518,7 +623,8 @@ class TrainEditDialog:
             })
 
             if hasattr(model, 'best_params_'):
-                self.model.settings["best_params"] = str(model.best_params_)  # Сериализация
+                self.model.settings["best_params"] = model.best_params_
+                print(self.model.settings["best_params"])
 
             if self.model.task == "Classification":
                 self.model.metrics = {

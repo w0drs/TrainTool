@@ -40,9 +40,38 @@ class PDFReportGenerator:
         pdf.cell(200, 10, txt=f"Name: {model.model_name}", ln=True)
         pdf.cell(200, 10, txt=f"Task: {model.task}", ln=True)
 
+        # model settings
+        pdf.set_font("","B")
+        if model.settings:
+            best_params: dict | None = model.settings.get("best_params", None)
+            print(best_params)
+            if best_params:
+                pdf.cell(200, 10, txt="Best parameters of model:", ln=True)
+                pdf.set_font("")
+                for setting, value in best_params.items():
+                    print(f"{setting}: {value}")
+                    pdf.cell(200, 10, txt=f"'{setting}': {value}", ln=True)
+            else:
+                pdf.cell(200, 10, txt="Using default model settings", ln=True)
+        else:
+            pdf.cell(200, 10, txt="Using default model settings", ln=True)
+
         # Dataset path
         pdf.set_font("", "B")
         pdf.cell(200, 10, txt=f"Dataset path: {dataset.path}", ln=True)
+
+        # Dataset settings
+        if dataset.settings:
+            pdf.set_font("", "B")
+            pdf.cell(200, 10, txt="Dataset transforms:", ln=True)
+            pdf.set_font("")
+
+            for column, list_of_methods in dataset.settings.items():
+                pdf.cell(200, 10, txt=f"{column}:", ln=True)
+                for i, method in enumerate(list_of_methods):
+                    pdf.cell(200, 10, txt=f"{i+1}) {method}", ln=True)
+            pdf.ln(10)
+
 
         # Metrics
         pdf.set_font("", "B")

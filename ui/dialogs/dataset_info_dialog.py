@@ -51,7 +51,9 @@ class DatasetInfoDialog:
     def _initialize_dialog(self):
         self.dialog = ft.AlertDialog(
             content=ft.Container(
-                content=self.content,
+                content=ft.ListView(
+                    controls=[self.content]
+                ),
                 width=350,
                 height=500,
                 padding=20,

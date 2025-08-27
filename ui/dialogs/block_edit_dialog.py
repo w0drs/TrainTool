@@ -66,6 +66,8 @@ class EditDialog:
                 ft.dropdownm2.Option("Random forest"),
                 ft.dropdownm2.Option("Decision tree"),
                 ft.dropdownm2.Option("K-nearest neighbors"),
+                ft.dropdownm2.Option("AdaBoost"),
+                ft.dropdownm2.Option("CatBoost"),
 
             ],
             on_change=self._on_model_change,
@@ -79,11 +81,15 @@ class EditDialog:
             options=[
                 ft.dropdownm2.Option("Nothing"),
                 ft.dropdownm2.Option("Linear regression"),
+                ft.dropdownm2.Option("Ridge regression"),
+                ft.dropdownm2.Option("Lasso regression"),
+                ft.dropdownm2.Option("ElasticNet regression"),
                 ft.dropdownm2.Option("SVM"),
                 ft.dropdownm2.Option("Random forest"),
                 ft.dropdownm2.Option("Decision tree"),
                 ft.dropdownm2.Option("K-nearest neighbors"),
-
+                ft.dropdownm2.Option("AdaBoost"),
+                ft.dropdownm2.Option("CatBoost"),
             ],
             on_change=self._on_model_change,
             width=250,
