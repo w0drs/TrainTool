@@ -1,6 +1,6 @@
 # 🧠 TrainTool (ML Trainer)  
-https://img.shields.io/badge/Flet-Framework-blue?style=flat&logo=flutter
-https://img.shields.io/badge/Python-3.8%252B-green?style=flat&logo=python  
+![flet_banner](https://img.shields.io/badge/Flet-Framework-blue?style=flat&logo=flutter)
+![python_banner](https://img.shields.io/badge/Python-3.8%252B-green?style=flat&logo=python)  
 Графическое приложение на Python для обучения машинного обучения без написания кода. Загружайте свои датасеты, выбирайте модель, обучайте и экспортируйте результаты — все в несколько кликов.  
 ![Главная страница с блоками](images/MainPage.png)    
 ## ✨ Возможности  
